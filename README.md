@@ -1,8 +1,8 @@
 
-# Job Monitor Service
-Machine Problem: Job Monitor     
+# Concurrency
+Machine Problem: Concurrency     
 
- A REST API which handles the job monitoring
+An application which reads from a text file a list of Job IDs and queries a JobMonitor REST API to get all of the metadata for that job.
 
 ## Getting Started
 

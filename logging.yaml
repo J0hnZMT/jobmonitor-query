@@ -1,0 +1,50 @@
+---
+version: 1
+disable_existing_loggers: True
+formatters:
+    standard:
+        format: "%(asctime)s:%(name)s:%(levelname)s:%(message)s"
+    error:
+        format: "%(levelname)s:<PID %(process)d:%(processName)s>:%(name)s.%(funcName)s(): %(message)s"
+
+handlers:
+    console:
+        class: logging.StreamHandler
+        level: DEBUG
+        formatter: standard
+        stream: ext://sys.stdout
+
+    debug_file_handler:
+        class: logging.handlers.RotatingFileHandler
+        level: DEBUG
+        formatter: standard
+        filename: listdir_logs.log
+        maxBytes: 5242880 # 5MB
+        backupCount: 5
+        encoding: utf8
+
+    error_file_handler:
+        class: logging.handlers.RotatingFileHandler
+        level: ERROR
+        formatter: error
+        filename: listdir_logs.log
+        maxBytes: 5242880 # 5MB
+        backupCount: 5
+        encoding: utf8
+
+
+root:
+    level: DEBUG
+    handlers: [console, debug_file_handler, error_file_handler]
+    propogate: yes
+
+loggers:
+    <module>:
+        level: DEBUG
+        handlers: [console, debug_file_handler, error_file_handler]
+        propogate: yes
+
+    <module.x>:
+        level: ERROR
+        handlers: [debug_file_handler, error_file_handler]
+        propogate: yes
