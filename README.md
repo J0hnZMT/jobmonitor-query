@@ -8,32 +8,10 @@ An application which reads from a text file a list of Job IDs and queries a JobM
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-### Prerequisites
-
-First you need to install the docker
-
-download docker on https://www.docker.com/
-
-then fork this project
-```
-git clone https://github.com/J0hnZMT/jobmonitorservice
-```
-## To Build the docker
-
-type in the command line
-```
-docker build -t job_monitor .
-```
-## To run in the docker container
+### to run
 
 ```
-docker container run job_monitor
-```
-## create database
-
-type in the command line
-```
-docker container run job_monitor
+python job_query.py [text file]
 ```
 
 ## Author

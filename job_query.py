@@ -11,6 +11,7 @@ import logging
 
 # initialization
 url_with_job_ids = []
+list_metadata = []
 t1 = time.perf_counter()
 
 
@@ -44,6 +45,7 @@ setup_logging(path, level, env)
 logger = logging.getLogger(__name__)
 logger.info("logger set..")
 
+
 # config files
 def config_open(filename, section):
     # create a parser
@@ -66,6 +68,7 @@ def config_open(filename, section):
 config = config_open('config.ini', 'parameter')
 api_url = config['url']
 thread = config['num_threads']
+table = config['table']
 
 
 def file_open(filename):
@@ -85,23 +88,26 @@ def json_parse(json_result):
     result = json_result
     metadata = result['data']
     data = metadata[0]
-    store(data)
+    logger.info(data)
+    list_metadata.append(data)
 
 
-def store(result):
-    db_data = (result['job_id'], result['app_name'], result['state'], result['date_created'])
-    print(db_data)
+def store():
     # store to sqlite db
     conn = sqlite3.connect('testing.db')
+    logger.info("Database Opened")
     c = conn.cursor()
-    c.execute('''CREATE TABLE result 
+    c.execute('''CREATE TABLE IF NOT EXISTS {} 
                     ("id" INTEGER PRIMARY KEY AUTOINCREMENT, 
                     "job_id" TEXT, 
                     "app_name" TEXT, 
                     "state" TEXT, 
-                    "date" TEXT);''')
-    c.execute("INSERT INTO result VALUES (?, ?, ?, ?);", (result['job_id'], result['app_name'], result['state'], result['date_created']))
+                    "date" TEXT);'''.format(table))
+    c.executemany("""INSERT INTO {} (job_id, app_name, state, date)
+                    VALUES (:job_id, :app_name, :state, :date_created);""".format(table), list_metadata)
+    logger.info("Metadata added")
     conn.commit()
+    conn.close()
 
 
 def query_api():
@@ -114,9 +120,10 @@ def main():
     parser.add_argument("text", nargs='?', help="File name of the text file with job ids", type=str)
     args = parser.parse_args()
     file_open(args.text)
+    store()
 
 
 if __name__ == "__main__":
     main()
     t2 = time.perf_counter()
-    print(f'Finished in {t2 - t1} seconds')
+    logger.info(f'Finished in {t2 - t1} seconds')
